@@ -139,6 +139,10 @@ class App extends Component {
           />
       </header>
     );
+    
+    let side_menu = (<aside id="aside-main" className="aside-start aside-primary font-weight-light aside-hide-xs d-flex flex-column h-auto">
+      <Menu {...this.props}/>
+    </aside>);
 
     let routes = [
       <Route key='inbox' path="/" exact component={() => <Inbox wallet_address={this.state.wallet_address} jwk={this.state.jwk} />} />,
@@ -152,6 +156,7 @@ class App extends Component {
       ];
       if(this.props.location !== '/login') routes.push(<Redirect key='redirect-to-login' to='/login' />);
       header = null;
+      side_menu = null;
     }
 
     if(this.state.isAuthenticated && this.props.location.pathname === '/login') {
@@ -167,9 +172,7 @@ class App extends Component {
       <div id="wrapper" className="d-flex align-items-stretch flex-column">
         <ToastContainer />
         {header}
-        <aside id="aside-main" className="aside-start aside-primary font-weight-light aside-hide-xs d-flex flex-column h-auto">
-          <Menu {...this.props}/>
-        </aside>
+        {side_menu}
         <div id="middle" class="flex-fill">
         {routes}
         </div>
