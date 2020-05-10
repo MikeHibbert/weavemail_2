@@ -30,13 +30,13 @@ class PageHeader extends Component {
 
       header = (
         <>
-        <div class="container-fluid position-relative">
-        <nav class="navbar navbar-expand-lg navbar-light justify-content-lg-between justify-content-md-inherit h--70">
-          <div class="align-items-start">
-          <a href="#aside-main" 
-              onClick={this.handleMobileToggle.bind(this)}
-              class="btn-sidebar-toggle h-100 d-inline-block d-lg-none justify-content-center align-items-center p-2">
-								<span class="group-icon">
+        <div className="container-fluid position-relative">
+        <nav className="navbar navbar-expand-lg navbar-light justify-content-lg-between justify-content-md-inherit h--70">
+          <div className="align-items-start">
+          <a  
+              onClick={() => this.props.toggleAside()}
+              className="btn-sidebar-toggle h-100 d-inline-block d-lg-none justify-content-center align-items-center p-2">
+								<span className="group-icon">
 									<i>
 										<svg width="25" viewBox="0 0 20 20">
 											<path d="M 19.9876 1.998 L -0.0108 1.998 L -0.0108 -0.0019 L 19.9876 -0.0019 L 19.9876 1.998 Z"></path>

@@ -18,30 +18,18 @@ class App extends Component {
     contentToggled: false,
     contentStyle: {marginLeft: '0px'},
     balance: 0,
-    wallet_address: null
+    wallet_address: null,
+    aside_classes: "aside-start aside-primary font-weight-light aside-hide-xs d-flex flex-column h-auto",
+    aside_open: false
   }
 
   constructor(props) {
     super(props);
 
-    this.toggleContent.bind(this);
-    this.explandContentArea.bind(this);
+    this.toggleAside.bind(this);
     this.addErrorAlert.bind(this);
     this.addSuccessAlert.bind(this);
-  }
-
-  toggleContent() {
-    if(this.state.contentToggled) {
-      this.setState({contentToggled: false, contentStyle: null});
-    } else {
-      this.setState({contentToggled: true, contentStyle: {marginLeft: '0px'}});
-    }
-  }
-
-  explandContentArea() {
-    this.setState({contentToggled: true, contentStyle: {marginLeft: '0px'}});
-  }
-
+  } 
   componentDidMount() {
     const wallet_address = sessionStorage.getItem('AR_Wallet', null);
     const jwk = JSON.parse(sessionStorage.getItem('AR_jwk', null));  
@@ -126,6 +114,20 @@ class App extends Component {
       this.addSuccessAlert("Your wallet is now disconnected");
   }
 
+  toggleAside() {
+    if(this.state.aside_open) {
+      this.setState({
+        aside_classes: "aside-start aside-primary font-weight-light aside-hide-xs d-flex flex-column h-auto",
+        aside_open: false
+      });
+    } else {
+      this.setState({
+        aside_classes: "aside-start aside-primary font-weight-light aside-hide-xs d-flex flex-column h-auto js-aside-show",
+        aside_open: true
+      })
+    }
+  }
+
   render() {
     let header = (
     
@@ -135,13 +137,13 @@ class App extends Component {
           history={this.props.history} 
           current_balance={this.state.balance}
           wallet_address={this.state.wallet_address}
-          onToggleContenArea={this.toggleContent.bind(this)}
+          toggleAside={() => this.toggleAside() }
           />
       </header>
     );
     
-    let side_menu = (<aside id="aside-main" className="aside-start aside-primary font-weight-light aside-hide-xs d-flex flex-column h-auto">
-      <Menu {...this.props}/>
+    let side_menu = (<aside id="aside-main" className={this.state.aside_classes}>
+      <Menu {...this.props} toggleAside={() => this.toggleAside() }/>
     </aside>);
 
     let routes = [
@@ -172,9 +174,11 @@ class App extends Component {
       <div id="wrapper" className="d-flex align-items-stretch flex-column">
         <ToastContainer />
         {header}
-        {side_menu}
-        <div id="middle" class="flex-fill">
-        {routes}
+        <div id="wrapper_content" className="d-flex flex-fill">
+          {side_menu}
+          <div id="middle" className="flex-fill">
+          {routes}
+          </div>
         </div>
       </div>
     );

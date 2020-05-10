@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 class Menuitem extends Component {
 
   closeMenu() {
-    document.body.classList.remove('menu-open');
+    this.props.toggleAside();
   }
   
   render() {
