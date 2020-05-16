@@ -56,6 +56,7 @@ class PageHeader extends Component {
           </div>
           <UserMenu 
             wallet_address={this.props.wallet_address} 
+            username={this.props.username}
             history={this.props.history} 
             current_balance={this.props.current_balance}
            />    

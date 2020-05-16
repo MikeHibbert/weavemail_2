@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import EmailBadge from './EmailBadge';
+import {getName} from '../Message/helpers';
 
 class UserMenu extends Component {
   state = {
@@ -23,10 +24,6 @@ class UserMenu extends Component {
   }
 
   componentDidUpdate(prevProps) {
-    if(this.props.wallet_address !== undefined && this.props.wallet_address !== prevProps.wallet_address) {
-      this.setState({wallet_address: this.props.wallet_address});
-    }
-
     if(this.props.currrent_balance !== undefined && this.props.current_balance !== prevProps.current_balance) {
       this.setState({current_balance: this.props.current_balance});
     }
@@ -49,7 +46,6 @@ class UserMenu extends Component {
   }
 
   render() {
-    
     return (<>
       <nav>
           <ul className="nav pull-right">
@@ -86,7 +82,7 @@ class UserMenu extends Component {
               <i className="fi w--15 fi-close"></i>
             </span>
 
-            <span className="fs--14 d-none d-sm-inline-block font-weight-medium">{this.props.wallet_address}</span>
+            <span className="fs--14 d-none d-sm-inline-block font-weight-medium">{this.props.username}</span>
           </a>
 
           <div  className={this.state.navClasses.join(' ')} >

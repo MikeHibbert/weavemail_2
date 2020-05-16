@@ -6,8 +6,9 @@ import Menu from './components/MainMenu/Menu';
 import Login from './components/auth/Login';
 import Logout from './components/auth/Logout';
 import Inbox from './containers/Inbox/Inbox';
+import Message from './containers/message/Message';
 import SearchPage from './containers/Search/SearchPage';
-
+import getMessages, {getName} from './components/Message/helpers';
 import arweave from './arweave-config';
 import 'react-toastify/dist/ReactToastify.css';
 import './App.css';
@@ -20,8 +21,11 @@ class App extends Component {
     balance: 0,
     wallet_address: null,
     aside_classes: "aside-start aside-primary font-weight-light aside-hide-xs d-flex flex-column h-auto",
-    aside_open: false
+    aside_open: false,
+    messages: []
   }
+
+  interval = null;
 
   constructor(props) {
     super(props);
@@ -29,7 +33,9 @@ class App extends Component {
     this.toggleAside.bind(this);
     this.addErrorAlert.bind(this);
     this.addSuccessAlert.bind(this);
+    this.setMessages.bind(this);
   } 
+
   componentDidMount() {
     const wallet_address = sessionStorage.getItem('AR_Wallet', null);
     const jwk = JSON.parse(sessionStorage.getItem('AR_jwk', null));  
@@ -42,6 +48,12 @@ class App extends Component {
     const isAuthenticated = sessionStorage.getItem('isAuthenticated');
 
     this.setState({isAuthenticated: isAuthenticated === 'true' ? true : false});
+
+    const that = this;
+    // this.interval = setInterval(async function() {
+    //   const messages = await getMessages();
+    //     that.setState({messages: messages});   
+    // }, 30 * 1000);
   }
 
   componentDidUpdate(prevProps) {
@@ -54,7 +66,13 @@ class App extends Component {
     }
   }
 
-  loadWallet(wallet_address) {
+  componentWillUnmount() {
+    if(this.interval) {
+      clearInterval(this.interval);
+    }
+  }
+
+  async loadWallet(wallet_address) {
     const that = this;
 
     if(wallet_address) {
@@ -64,7 +82,16 @@ class App extends Component {
             const state = {balance: ar};
 
             that.setState(state);
-        });   
+        }); 
+
+        const messages = await getMessages();
+
+        that.setState({messages: messages});     
+        
+
+        getName(wallet_address).then((username) => {
+          that.setState({username: username});
+        });
     }     
   }
 
@@ -128,6 +155,11 @@ class App extends Component {
     }
   }
 
+  setMessages(messages) {
+    this.setState({messages: messages});
+    debugger;
+  }
+
   render() {
     let header = (
     
@@ -137,6 +169,7 @@ class App extends Component {
           history={this.props.history} 
           current_balance={this.state.balance}
           wallet_address={this.state.wallet_address}
+          username={this.state.username}
           toggleAside={() => this.toggleAside() }
           />
       </header>
@@ -147,7 +180,13 @@ class App extends Component {
     </aside>);
 
     let routes = [
-      <Route key='inbox' path="/" exact component={() => <Inbox wallet_address={this.state.wallet_address} jwk={this.state.jwk} />} />,
+      <Route key='inbox' path="/" exact component={() => <Inbox messages={this.state.messages} wallet_address={this.state.wallet_address} jwk={this.state.jwk} />} />,
+      <Route key='message-detail' path="/message-detail/:id" exact component={() => <Message 
+                                                                      wallet_address={this.state.wallet_address} 
+                                                                      jwk={this.state.jwk} 
+                                                                      location={this.props.location}
+                                                                      messages={this.state.messages}
+                                                                      />} />,
       <Route key='search' path="/search" exact component={() => <SearchPage wallet_address={this.state.wallet_address} jwk={this.state.jwk} />} />,
       <Route key='logout' path="/logout" exact component={() => <Logout onLogout={this.disconnectWallet.bind(this)} addSuccessAlert={this.addSuccessAlert} explandContentArea={() => this.explandContentArea} />} />
     ];

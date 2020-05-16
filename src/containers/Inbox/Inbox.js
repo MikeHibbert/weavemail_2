@@ -1,8 +1,7 @@
 import React, { Component } from 'react';
-import settings from '../../app-config';
 import Spinner from '../../components/Spinner/Spinner';
-import getMessages from '../../components/Message/helpers';
 import InboxMessage from './InboxMessage';
+import Pagination from "react-js-pagination";
 
 
 class Inbox extends Component {
@@ -11,43 +10,85 @@ class Inbox extends Component {
     current_balance: 0.0,
     measure_enabled: false,
     account: null,
-    my_messages: [],
+    messages: [],
     latest_messages: [],
-    loading: true
+    loading: true,
+    active_page: 1
   }
 
-  async componentDidMount() {
-    const messages = await getMessages();
-    
-    this.setState({my_messages: messages, loading: false});
-  }  
+  constructor(props) {
+    super(props);
+
+    this.handlePageChange.bind(this);
+    this.getPaginatedMessages.bind(this);
+  }
+
+  componentDidMount() {
+    if(this.state.messages.length == 0) {
+        this.handlePageChange(this.state.active_page);
+    }
+  }
+
+  componentDidUpdate(prevProps) {
+    if(this.props.messages != undefined && this.props.messages != prevProps.messages) {
+        this.handlePageChange(this.state.active_page);
+    }  
+  }
+
+  componentWillUnmount() {
+    // fix Warning: Can't perform a React state update on an unmounted component
+    this.setState = (state,callback)=>{
+        return;
+    };
+  }
+
+  handlePageChange(active_page) {
+    const start = (active_page - 1) * 10;
+    const end = start + 9;
+
+    const messages = this.getPaginatedMessages(start, end);
+
+    this.setState({messages: messages, active_page: active_page})
+  }
+
+  getPaginatedMessages(start, end) {
+      
+    const messages = [];
+    for(let i=start; i <= end; i++) {
+      if(this.props.messages[i] != undefined) {
+        messages.push(this.props.messages[i]);
+      }
+      
+    }
+
+    return messages;
+  }
 
   render() {
-    let my_messages = [];
-    let latest_messages = [];
+    let messages_rows = [<Spinner key={1} />];
 
-    if(this.state.loading) {
-        my_messages = [<Spinner key={1} />];
-    } else {
-        const messages = this.state.my_messages.map(message => {
-            return <InboxMessage message={message} />;
-        })
+    if(this.state.messages.length > 0) {
+        debugger;
 
-        my_messages = <div className="portlet-body pt-0">
-                            <div class="table-responsive">
+        const messages = this.state.messages.map(msg => {
+            return <InboxMessage message={msg} key={msg.id} />;
+        });
 
-                                <table class="table table-align-middle border-bottom mb-6">
+        messages_rows = <div className="portlet-body pt-0">
+                            <div className="table-responsive">
+
+                                <table className="table table-align-middle border-bottom mb-6">
 
                                     <thead>
-                                        <tr class="text-muted fs--13">
+                                        <tr className="text-muted fs--13">
                                             <th>
-                                                <span class="px-2 p-0-xs">
+                                                <span className="px-2 p-0-xs">
                                                     SUBJECT
                                                 </span>
                                             </th>
-                                            <th class="w--200 hidden-lg-down">SENDER</th>
-                                            <th class="w--200 hidden-lg-down">DATE</th>
-                                            <th class="w--60">&nbsp;</th>
+                                            <th className="w--200 hidden-lg-down">SENDER</th>
+                                            <th className="w--200 hidden-lg-down">DATE</th>
+                                            <th className="w--60">&nbsp;</th>
                                         </tr>
                                     </thead>
 
@@ -55,14 +96,23 @@ class Inbox extends Component {
                                         {messages}
                                     </tbody>
                                 </table>
+                                <Pagination
+                                    activePage={this.state.active_page}
+                                    itemsCountPerPage={10}
+                                    totalItemsCount={this.props.messages.length}
+                                    pageRangeDisplayed={5}
+                                    onChange={(active_page) => {this.handlePageChange(active_page)}}
+                                    itemClass='page-item'
+                                    linkClass='page-link'
+                                    activeClass='active'
+                                    activeLinkClass=''
+                                    />
                             </div>
                         </div>;
     }
 
     const now = new Date();
     const a_week_ago = now.setDate(now.getDate() - 7);
-
-
 
     return ( <>
     <div className="row gutters-sm">
@@ -83,7 +133,7 @@ class Inbox extends Component {
                     </span>
                 </div>
 
-                {my_messages}
+                {messages_rows}
             </div>
         </div>
     </div>
