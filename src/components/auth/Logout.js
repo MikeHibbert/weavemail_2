@@ -7,7 +7,7 @@ class Logout extends Component {
     // this.props.addSuccessAlert("You have successfully disconnected your wallet.");
     
     this.props.onLogout();
-    this.props.explandContentArea();
+    this.props.expandContentArea();
       
   }
 

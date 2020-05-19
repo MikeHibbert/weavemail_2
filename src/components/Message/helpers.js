@@ -159,14 +159,16 @@ export const sendMessage = async (message) => {
     const jwk = JSON.parse(sessionStorage.getItem('AR_jwk', null));
     var mailTagUnixTime = Math.round((new Date()).getTime() / 1000)
 
-    var tokens = message.tokens;
+    var tokens = message.td_qty;
     if(tokens == '') {
         tokens = '0';
     }
 
     tokens = arweave.ar.arToWinston(tokens);
 
-    var pub_key = get_public_key(message.to);
+    var pub_key = await get_public_key(message.to);
+
+    debugger;
 
     if(pub_key == undefined) {
         toast('Recipient has to send a transaction to the network, first!', { type: toast.TYPE.ERROR });

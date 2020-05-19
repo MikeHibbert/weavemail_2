@@ -53,7 +53,13 @@ class App extends Component {
 
     this.setState({isAuthenticated: isAuthenticated === 'true' ? true : false});
 
+    
+    if(this.props.isAuthenticated == undefined) {
+      return;
+    }
+
     const that = this;
+
     this.interval = setInterval(async function() {
       const messages = await getMessages();
 
@@ -62,7 +68,9 @@ class App extends Component {
         that.addSuccessAlert("You have " + new_count + " new messages")
       }
 
-      that.setState({messages: messages});   
+      const sent_messages = await getSentMessages();
+
+      that.setState({messages: messages, sent_messages: sent_messages});      
     }, 30 * 1000);
   }
 
@@ -104,7 +112,7 @@ class App extends Component {
 
         const sent_messages = await getSentMessages();
 
-        that.setState({messages: messages});     
+        that.setState({messages: messages, sent_messages: sent_messages});     
         
 
         getName(wallet_address).then((username) => {
@@ -146,7 +154,7 @@ class App extends Component {
 
               that.setState({isAuthenticated: true});
               sessionStorage.setItem('isAuthenticated', true);
-
+              that.resetContentArea();
               that.addSuccessAlert("You have successfully connected.");
           });
           
@@ -189,6 +197,18 @@ class App extends Component {
     }
   }
 
+  resetContentArea() {
+    document.body.classList.add('layout-admin'); 
+    document.body.classList.add('aside-sticky'); 
+    document.body.classList.add('header-sticky'); 
+  }
+
+  expandContentArea() {
+    document.body.classList.remove('layout-admin'); 
+    document.body.classList.remove('aside-sticky'); 
+    document.body.classList.remove('header-sticky'); 
+  }
+
   setMessages(messages) {
     this.setState({messages: messages});
     debugger;
@@ -226,23 +246,27 @@ class App extends Component {
       <Route key='new-message' path='/message/new' exact component={() => <NewMessage 
                                                                             wallet_address={this.state.wallet_address} 
                                                                             jwk={this.state.jwk}
+                                                                            history={this.props.history}
                                                                           />} />,
       <Route key='reply-message' path='/message/reply/:id' exact component={() => <MessageReply
                                                                             wallet_address={this.state.wallet_address} 
                                                                             jwk={this.state.jwk}
                                                                             messages={this.state.messages}
+                                                                            history={this.props.history}
                                                                           />} />,
       <Route key='search' path="/search" exact component={() => <SearchPage wallet_address={this.state.wallet_address} jwk={this.state.jwk} />} />,
-      <Route key='logout' path="/logout" exact component={() => <Logout onLogout={this.disconnectWallet.bind(this)} addSuccessAlert={this.addSuccessAlert} explandContentArea={() => this.explandContentArea} />} />
+      <Route key='logout' path="/logout" exact component={() => <Logout onLogout={this.disconnectWallet.bind(this)} addSuccessAlert={this.addSuccessAlert} expandContentArea={() => {this.expandContentArea()}} />} />
     ];
 
     if(!this.state.isAuthenticated) {
       routes = [
-        <Route key='login' path="/login" exact component={() => <Login explandContentArea={() => this.explandContentArea} setWalletAddress={this.setWalletAddress.bind(this)} />} />,
+        <Route key='login' path="/login" exact component={() => <Login expandContentArea={() => {this.expandContentArea()}} setWalletAddress={this.setWalletAddress.bind(this)} />} />,
       ];
       if(this.props.location !== '/login') routes.push(<Redirect key='redirect-to-login' to='/login' />);
       header = null;
       side_menu = null;
+    } else {
+      this.resetContentArea();
     }
 
     if(this.state.isAuthenticated && this.props.location.pathname === '/login') {

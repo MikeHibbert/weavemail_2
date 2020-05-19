@@ -15,7 +15,7 @@ const NewMessage = (props) => {
             subject: '',
             body: ''
         },
-        tokens: 0
+        td_qty: "0.000000000000"
     }
 
     return (<div className="row gutters-sm">
@@ -28,7 +28,7 @@ const NewMessage = (props) => {
                             </span>
                         </div>
                         <div className="portlet-body pt-0">
-                            <MessageForm message={message} />
+                            <MessageForm message={message} history={props.history}/>
                         </div>
                     </div>
                     

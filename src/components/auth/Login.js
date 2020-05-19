@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 
 class Auth extends Component {
   componentWillMount() {
-    this.props.explandContentArea();
+    this.props.expandContentArea();
   }
 
   inputChangedHandler(event, inputIdentifier) {
@@ -40,33 +40,64 @@ class Auth extends Component {
       form = <span>Loading your wallet ...</span>
     }
 
-    return (
-      <div className="padding-15">
+    return (<div className="wrapper">
+    <div className="d-lg-flex text-white min-h-100vh aside-primary">
 
-			<div className="login-box">
-
-
-				<form onSubmit={(event) => this.LoginHandler(event)} className="sky-form boxed">
-					<header><i className="fa fa-cloud-download"></i>  Connect Your AR Wallet</header>
-                    
-                    
-					<fieldset>
-                        <section>Please select your <strong>AR wallet</strong> file to connect and start using <strong>The Arweave Crypto Technical Analysis Portal</strong></section>
-						{form}
-
-					</fieldset>
-
-					<footer>
-						<div className="forgot-password pull-left">
-                             <a href="https://tokens.arweave.org/" target="_blank">Need some AR tokens?</a>
-                        </div>
-					</footer>
-				</form>
+      <div className="col-12 col-lg-5 d-lg-flex">
+        <div className="w-100 align-self-center">
 
 
-			</div>
+          <div className="py-7">
+            <h1 className="d-inline-block text-align-end text-center-md text-center-xs display-4 h2-xs w-100 max-w-600 w-100-md w-100-xs">
+              Sign in
+              <span className="display-3 h1-xs d-block font-weight-medium">
+                Weavemail
+              </span>
+            </h1>
+          </div>
 
-		</div>
+
+        </div>
+      </div>
+
+
+      <div className="col-12 col-lg-7 d-lg-flex">
+        <div className="w-100 align-self-center text-center-md text-center-xs py-2">
+
+
+          <form noValidate="" onSubmit={(event) => this.LoginHandler(event)} className="bs-validate p-5 py-6 rounded d-inline-block bg-white text-dark w-100 max-w-600">
+
+
+
+            <div className="form-label-group mb-3">
+            <h3>Login with your AR wallet</h3>
+            <section>Select your <strong>AR wallet</strong> file to start sending secure emails.</section>
+              {form}
+            </div>
+
+            <div className="row">
+
+              <div className="col-12 col-md-6 mt-4">
+                <button type="submit" className="btn btn-primary btn-block transition-hover-top">
+                  Sign In
+                </button>
+              </div>
+
+              <div className="col-12 col-md-6 mt-4 text-align-end text-center-xs">
+              <a href="https://tokens.arweave.org/" target="_blank">Need some FREE AR tokens?</a>
+              </div>
+
+            </div>
+
+          </form>
+
+        </div>
+      </div>
+
+
+
+    </div>
+  </div>
     );
   }
 }
