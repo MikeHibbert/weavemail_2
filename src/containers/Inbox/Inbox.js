@@ -67,47 +67,72 @@ class Inbox extends Component {
 
   render() {
     let messages_rows = [<Spinner key={1} />];
+    const that = this;
+
+    let title = "Inbox";
+    if(that.props.hasOwnProperty('showArchived')) {
+      title = "Archived (sent > 7 days ago)";
+    }
+
+    if(that.props.hasOwnProperty('showSent')) {
+      title = "Sent";
+    }
 
     if(this.state.messages.length > 0) {
-        const messages = this.state.messages.map(msg => {
-            return <InboxMessage message={msg} key={msg.id} />;
-        });
+      var oneWeekAgo = new Date();
+      oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+      var afterTimestamp = Math.round(oneWeekAgo.getTime() / 1000);
 
-        messages_rows = <div className="portlet-body pt-0">
-                            <div className="table-responsive">
+      
 
-                                <table className="table table-align-middle border-bottom mb-6">
+      const messages = this.state.messages.map(msg => {
+          if(that.props.hasOwnProperty('showArchived')) {
+            if(parseInt(msg["unixTime"]) > afterTimestamp) {
+              return null;
+            }
+          } else {
+            if(parseInt(msg["unixTime"]) < afterTimestamp) {
+              return null;
+            }
+          }
+          return <InboxMessage message={msg} key={msg.id} />;
+      });
 
-                                    <thead>
-                                        <tr className="text-muted fs--13">
-                                            <th>
-                                                <span className="px-2 p-0-xs">
-                                                    SUBJECT
-                                                </span>
-                                            </th>
-                                            <th className="w--200 hidden-lg-down">SENDER</th>
-                                            <th className="w--200 hidden-lg-down">DATE</th>
-                                            <th className="w--60">&nbsp;</th>
-                                        </tr>
-                                    </thead>
+      messages_rows = <div className="portlet-body pt-0">
+                          <div className="table-responsive">
 
-                                    <tbody id="item_list">
-                                        {messages}
-                                    </tbody>
-                                </table>
-                                <Pagination
-                                    activePage={this.state.active_page}
-                                    itemsCountPerPage={10}
-                                    totalItemsCount={this.props.messages.length}
-                                    pageRangeDisplayed={5}
-                                    onChange={(active_page) => {this.handlePageChange(active_page)}}
-                                    itemClass='page-item'
-                                    linkClass='page-link'
-                                    activeClass='active'
-                                    activeLinkClass=''
-                                    />
-                            </div>
-                        </div>;
+                              <table className="table table-align-middle border-bottom mb-6">
+
+                                  <thead>
+                                      <tr className="text-muted fs--13">
+                                          <th>
+                                              <span className="px-2 p-0-xs">
+                                                  SUBJECT
+                                              </span>
+                                          </th>
+                                          <th className="w--200 hidden-lg-down">SENDER</th>
+                                          <th className="w--200 hidden-lg-down">DATE</th>
+                                          <th className="w--60">&nbsp;</th>
+                                      </tr>
+                                  </thead>
+
+                                  <tbody id="item_list">
+                                      {messages}
+                                  </tbody>
+                              </table>
+                              <Pagination
+                                  activePage={this.state.active_page}
+                                  itemsCountPerPage={10}
+                                  totalItemsCount={this.props.messages.length}
+                                  pageRangeDisplayed={5}
+                                  onChange={(active_page) => {this.handlePageChange(active_page)}}
+                                  itemClass='page-item'
+                                  linkClass='page-link'
+                                  activeClass='active'
+                                  activeLinkClass=''
+                                  />
+                          </div>
+                      </div>;
     }
 
     const now = new Date();
@@ -128,7 +153,7 @@ class Inbox extends Component {
                     </div>
 
                     <span className="d-block text-muted text-truncate font-weight-medium pt-1">
-                        Inbox
+                        {title}
                     </span>
                 </div>
 

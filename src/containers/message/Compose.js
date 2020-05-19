@@ -47,6 +47,10 @@ const MessageForm = (props) => {
                 >										
             </textarea>
         </div>
+        <div className="form-label-group mb-4">
+            <input placeholder="Tokens to send" id="message_subject" name="tokens" type="text" value={message_values.tokens} onChange={handleChange} className="form-control" />
+            <label for="message_subject">Subject</label>
+        </div>
         <div class="clearfix container my-5">
 
             <a  class="btn btn-sm btn-primary btn-pill" onClick={() => { handleSend ()}}>

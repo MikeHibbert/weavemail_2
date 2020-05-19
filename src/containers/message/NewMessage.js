@@ -14,7 +14,8 @@ const NewMessage = (props) => {
         mail: {
             subject: '',
             body: ''
-        }
+        },
+        tokens: 0
     }
 
     return (<div className="row gutters-sm">

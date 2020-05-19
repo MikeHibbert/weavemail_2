@@ -11,6 +11,7 @@ class Menu extends Component {
         <ul id="nav_responsive" className="nav flex-column">
               <MenuItem icon='home' name='Inbox' url='/' {...this.props}/>
               <MenuItem icon='arrow-end' name='Sent' url='/sent' {...this.props}/>
+              <MenuItem icon='arrow-end' name='Archive' url='/archived' {...this.props}/>
         </ul>
         </nav>
       </div>

@@ -95,13 +95,6 @@ class UserMenu extends Component {
               <br />
             </div>
 
-            <div className="dropdown-divider"></div>
-
-            <a href="#!" className="dropdown-item text-truncate font-weight-medium">
-            Account Settings
-            <small className="d-block text-muted">profile, password and more...</small>
-            </a>
-
             <div className="dropdown-divider mb-0"></div>
 
             <Link to='/logout' className="prefix-icon-ignore dropdown-footer dropdown-custom-ignore font-weight-medium pt-3 pb-3"><i className="fi fi-power float-start"></i> Log Out</Link>

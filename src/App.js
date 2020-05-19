@@ -10,7 +10,7 @@ import Message from './containers/message/Message';
 import NewMessage from './containers/message/NewMessage';
 import MessageReply from './containers/message/MessageReply';
 import SearchPage from './containers/Search/SearchPage';
-import getMessages, {getName} from './components/Message/helpers';
+import getMessages, {getName, getSentMessages} from './components/Message/helpers';
 import arweave from './arweave-config';
 import Notifier from "react-desktop-notification";
 import 'react-toastify/dist/ReactToastify.css';
@@ -25,7 +25,8 @@ class App extends Component {
     wallet_address: null,
     aside_classes: "aside-start aside-primary font-weight-light aside-hide-xs d-flex flex-column h-auto",
     aside_open: false,
-    messages: []
+    messages: [],
+    sent_messages: []
   }
 
   interval = null;
@@ -53,10 +54,16 @@ class App extends Component {
     this.setState({isAuthenticated: isAuthenticated === 'true' ? true : false});
 
     const that = this;
-    // this.interval = setInterval(async function() {
-    //   const messages = await getMessages();
-    //     that.setState({messages: messages});   
-    // }, 30 * 1000);
+    this.interval = setInterval(async function() {
+      const messages = await getMessages();
+
+      if(messages.length > that.state.messages.length && that.state.messages.length > 0) {
+        const new_count = messages.length - that.state.messages.length;
+        that.addSuccessAlert("You have " + new_count + " new messages")
+      }
+
+      that.setState({messages: messages});   
+    }, 30 * 1000);
   }
 
   componentDidUpdate(prevProps) {
@@ -92,8 +99,10 @@ class App extends Component {
         
         if(messages.length > this.state.messages.length && this.state.messages.length > 0) {
           const new_count = messages.length - this.state.messages.length;
-          this.addSuccessAlert("You have " + new_count + " new messages")
+          this.addSuccessAlert("You have " + new_count + " new messages");
         }
+
+        const sent_messages = await getSentMessages();
 
         that.setState({messages: messages});     
         
@@ -206,6 +215,8 @@ class App extends Component {
 
     let routes = [
       <Route key='inbox' path="/" exact component={() => <Inbox messages={this.state.messages} wallet_address={this.state.wallet_address} jwk={this.state.jwk} />} />,
+      <Route key='sent' path="/sent" exact component={() => <Inbox messages={this.state.sent_messages} showSent={true} wallet_address={this.state.wallet_address} jwk={this.state.jwk} />} />,
+      <Route key='archive' path="/archived" exact component={() => <Inbox messages={this.state.messages} showArchived={true} wallet_address={this.state.wallet_address} jwk={this.state.jwk} />} />,
       <Route key='message-detail' path="/message-detail/:id" exact component={() => <Message 
                                                                       wallet_address={this.state.wallet_address} 
                                                                       jwk={this.state.jwk} 
