@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { Link } from 'react-router-dom';
 import Spinner from '../../components/Spinner/Spinner';
 import InboxMessage from './InboxMessage';
 import Pagination from "react-js-pagination";
@@ -68,8 +69,6 @@ class Inbox extends Component {
     let messages_rows = [<Spinner key={1} />];
 
     if(this.state.messages.length > 0) {
-        debugger;
-
         const messages = this.state.messages.map(msg => {
             return <InboxMessage message={msg} key={msg.id} />;
         });
@@ -122,9 +121,9 @@ class Inbox extends Component {
 
                     <div className="float-end">
 
-                        <a href="message-write.html" className="btn btn-sm btn-primary btn-pill px-2 py-1 fs--15 mt--n3">
+                        <Link to='/message/new' className="btn btn-sm btn-primary btn-pill px-2 py-1 fs--15 mt--n3">
                             + write
-                        </a>
+                        </Link>
 
                     </div>
 

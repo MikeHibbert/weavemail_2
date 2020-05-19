@@ -7,9 +7,12 @@ import Login from './components/auth/Login';
 import Logout from './components/auth/Logout';
 import Inbox from './containers/Inbox/Inbox';
 import Message from './containers/message/Message';
+import NewMessage from './containers/message/NewMessage';
+import MessageReply from './containers/message/MessageReply';
 import SearchPage from './containers/Search/SearchPage';
 import getMessages, {getName} from './components/Message/helpers';
 import arweave from './arweave-config';
+import Notifier from "react-desktop-notification";
 import 'react-toastify/dist/ReactToastify.css';
 import './App.css';
 
@@ -86,6 +89,12 @@ class App extends Component {
 
         const messages = await getMessages();
 
+        
+        if(messages.length > this.state.messages.length && this.state.messages.length > 0) {
+          const new_count = messages.length - this.state.messages.length;
+          this.addSuccessAlert("You have " + new_count + " new messages")
+        }
+
         that.setState({messages: messages});     
         
 
@@ -93,6 +102,22 @@ class App extends Component {
           that.setState({username: username});
         });
     }     
+  }
+
+  newMessages(messages) {
+    const new_messages = [];
+
+    for(let i in messages) {
+      const message = messages[i];
+
+      const old_message = this.state.messages.find((msg) => msg.id == message.id);
+
+      if(!old_message) {
+        new_messages.push(message)
+      }
+    }
+
+    return new_messages;
   }
 
   setWalletAddress(wallet_address_files) {
@@ -187,6 +212,15 @@ class App extends Component {
                                                                       location={this.props.location}
                                                                       messages={this.state.messages}
                                                                       />} />,
+      <Route key='new-message' path='/message/new' exact component={() => <NewMessage 
+                                                                            wallet_address={this.state.wallet_address} 
+                                                                            jwk={this.state.jwk}
+                                                                          />} />,
+      <Route key='reply-message' path='/message/reply/:id' exact component={() => <MessageReply
+                                                                            wallet_address={this.state.wallet_address} 
+                                                                            jwk={this.state.jwk}
+                                                                            messages={this.state.messages}
+                                                                          />} />,
       <Route key='search' path="/search" exact component={() => <SearchPage wallet_address={this.state.wallet_address} jwk={this.state.jwk} />} />,
       <Route key='logout' path="/logout" exact component={() => <Logout onLogout={this.disconnectWallet.bind(this)} addSuccessAlert={this.addSuccessAlert} explandContentArea={() => this.explandContentArea} />} />
     ];

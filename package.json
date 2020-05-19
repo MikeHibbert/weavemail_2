@@ -9,6 +9,7 @@
     "arweave": "^1.7.1",
     "moment": "^2.25.3",
     "react": "^16.13.1",
+    "react-desktop-notification": "^1.0.9",
     "react-dom": "^16.13.1",
     "react-inlinesvg": "^1.2.0",
     "react-js-pagination": "^3.0.3",

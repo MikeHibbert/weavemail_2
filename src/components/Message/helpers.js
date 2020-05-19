@@ -72,6 +72,35 @@ async function getMessages () {
     return tx_rows;
 }
 
+
+export const sendMessage = async (message) => {
+    alert("send message!" + message)
+}
+
+export const addTransactionToPending = (tx_id) => {
+    let pending = localStorage.getItem('weavemail_pending_txs');
+
+    if(!pending) {
+        pending = JSON.stringify([tx_id]);
+    } else {
+        pending = JSON.parse(pending);
+        pending.push(tx_id);
+    }
+
+    localStorage.setItem(JSON.stringify(pending));
+}
+
+export const getPendingTransactions = () => {
+    let pending = localStorage.getItem('weavemail_pending_txs');
+
+    if(!pending) {
+        pending = [];
+        localStorage.setItem(JSON.stringify(pending));
+    }
+
+    return pending;
+}
+
 export const getName = async (addr) => {
 	let get_name_query =
 		{

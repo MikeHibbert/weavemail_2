@@ -14,6 +14,8 @@ const Message = (props) => {
     let { id } = useParams();
 
     let message_detail = <Spinner />;
+
+    const reply_link_url = "/message/reply/" + id;
     
 
     if(props.messages.length > 0) {
@@ -53,10 +55,10 @@ const Message = (props) => {
 
                                     <div className="clearfix container py-3 bg-light row-pill rounded mt-5">
 
-                                        <a href="message-reply.html" className="btn btn-sm btn-primary btn-pill">
+                                        <Link to={reply_link_url} className="btn btn-sm btn-primary btn-pill">
                                             <i className="fi fi-arrow-right-3"></i>
                                             Reply
-                                        </a>
+                                        </Link>
                                     </div>
 
                                 </div>

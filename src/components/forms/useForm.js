@@ -13,3 +13,5 @@ export const useForm = initialValues => {
     }
   ];
 };
+
+export default useForm;

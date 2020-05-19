@@ -8,13 +8,22 @@ import {
 } from "react-router-dom";
 import MessageForm from './Compose';
 
-const NewMessage = (props) => {
-    const message = {
+const MessageReply = (props) => {
+    let { id } = useParams();
+
+    let message = {
         to: '',
         mail: {
             subject: '',
             body: ''
         }
+    }
+
+    if(props.messages.length > 0) {
+        message = props.messages.find((message) => {return message.id === id});
+        message['to'] = message['from'];
+        message.mail.subject = "RE: " + message.mail.subject;
+        message.mail.body = "\n\n...\n" + message.mail.body;
     }
 
     return (<div className="row gutters-sm">
@@ -23,7 +32,7 @@ const NewMessage = (props) => {
                         <div className="portlet-header border-bottom">
                             
                             <span className="d-block text-muted text-truncate font-weight-medium pt-1">
-                                New Message
+                                Reply to {message.from}
                             </span>
                         </div>
                         <div className="portlet-body pt-0">
@@ -35,4 +44,4 @@ const NewMessage = (props) => {
             </div>);
 }
 
-export default NewMessage;
+export default MessageReply;
