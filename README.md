@@ -1,8 +1,8 @@
-##Weavemail 2
+## Weavemail 2
 
 Live demo available at https://arweave.net/nvPoTltZtUrqwqX8iZCYYW0kE2tBelmAKHLtPaWmxCA
 
-##Features
+## Features
 
 - Inbox with refresh every 30 seconds
 - Sent messages section
