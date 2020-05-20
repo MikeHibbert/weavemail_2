@@ -72,7 +72,7 @@ class UserMenu extends Component {
           </ul>
       </nav>
       <ul className="list-inline list-unstyled mb-0 d-flex align-items-end">
-        <EmailBadge new_email_count={this.props.new_email_count} />
+        <EmailBadge new_email_count={this.props.new_email_count} clearNewEmailCount={() => {this.props.clearNewEmailCount()}} />
         <li className="list-inline-item ml--6 mr--6 dropdown">
 
           <a onClick={this.handleMenuToggle.bind(this)} className="btn btn-sm btn-light dropdown-toggle btn-pill pl--12 pr--12" data-toggle="dropdown" aria-expanded="false" aria-haspopup="true">
@@ -86,17 +86,6 @@ class UserMenu extends Component {
           </a>
 
           <div  className={this.state.navClasses.join(' ')} >
-            
-            <div className="dropdown-header fs--14 py-4">
-              <div className="w--60 h--60 rounded-circle bg-light bg-cover float-start" style={{backgroundImage:"url('images/icons/user80.png')"}}></div>
-  
-              <span className="d-block text-muted font-weight-medium text-truncate">{this.props.wallet_address}</span>
-              <small className="d-block text-muted margin-bottom-20"><b>Last Login:</b> 2019-09-03 01:48</small>
-              <br />
-            </div>
-
-            <div className="dropdown-divider mb-0"></div>
-
             <Link to='/logout' className="prefix-icon-ignore dropdown-footer dropdown-custom-ignore font-weight-medium pt-3 pb-3"><i className="fi fi-power float-start"></i> Log Out</Link>
  
           </div>

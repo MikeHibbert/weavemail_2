@@ -59,6 +59,8 @@ class PageHeader extends Component {
             username={this.props.username}
             history={this.props.history} 
             current_balance={this.props.current_balance}
+            new_email_count={this.props.new_email_count}
+            clearNewEmailCount={() => {this.props.clearNewEmailCount()}}
            />    
         </nav>
         </div>

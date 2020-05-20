@@ -27,7 +27,8 @@ const MessageForm = (props) => {
     async function handleSend() {
         if(validForm()) {
             await sendMessage(message_values);
-            
+
+            props.getPendingMessages();
             props.history.push('/');
         } else {
             toast("Please fill in all fields before sending your email.", { type: toast.TYPE.ERROR });
@@ -41,7 +42,7 @@ const MessageForm = (props) => {
             <label htmlFor="message_subject">To</label>
         </div>
         <div className="form-label-group mb-4">
-            <input placeholder="Subject" id="message_subject" name="subject" type="text" value={message_values.mail.subject} onChange={handleChange} className="form-control" />
+            <input placeholder="Subject" id="message_subject" name="subject" type="text" value={message_values.subject} onChange={handleChange} className="form-control" />
             <label htmlFor="message_subject">Subject</label>
         </div>
         <div>
@@ -49,7 +50,7 @@ const MessageForm = (props) => {
                 className="medium-editor bg-white border rounded p-3 w-100 min-h-300 js-mediumified medium-editor-hidden" 
                 placeholder="Type your message..." 
                 name="body"
-                value={message_values.mail.body} onChange={handleChange}
+                value={message_values.body} onChange={handleChange}
                 >										
             </textarea>
         </div>

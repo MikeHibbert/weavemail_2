@@ -36,7 +36,7 @@ const MessageReply = (props) => {
                             </span>
                         </div>
                         <div className="portlet-body pt-0">
-                            <MessageForm message={message} history={props.history} />
+                            <MessageForm message={message} history={props.history} getPendingMessages={() => { props.getPendingMessages() }} />
                         </div>
                     </div>
                     

@@ -11,7 +11,7 @@ const EmailBadge = function(props) {
     return (
         <li className="list-inline-item ml--6 mr--6 dropdown">
 
-            <Link to='/' className="btn btn-sm rounded-circle btn-light dropdown-toggle" >
+            <Link to='/' onClick={() => {props.clearNewEmailCount()}} className="btn btn-sm rounded-circle btn-light dropdown-toggle" >
                 
                 {badge}
 

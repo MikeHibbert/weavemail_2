@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import Spinner from '../../components/Spinner/Spinner';
 import InboxMessage from './InboxMessage';
+import SentMessage from './SentMessage';
 import Pagination from "react-js-pagination";
 
 
@@ -74,8 +75,28 @@ class Inbox extends Component {
       title = "Archived (sent > 7 days ago)";
     }
 
+    let thead = <tr className="text-muted fs--13">
+                    <th>
+                        <span className="px-2 p-0-xs">
+                            SUBJECT
+                        </span>
+                    </th>
+                    <th className="w--200 hidden-lg-down">SENDER</th>
+                    <th className="w--200 hidden-lg-down">DATE</th>
+                    <th className="w--60">&nbsp;</th>
+                </tr>;
     if(that.props.hasOwnProperty('showSent')) {
       title = "Sent";
+      thead = <tr className="text-muted fs--13">
+                    <th>
+                        <span className="px-2 p-0-xs">
+                            To
+                        </span>
+                    </th>
+                    <th className="w--200 hidden-lg-down">Trasaction ID</th>
+                    <th className="w--200 hidden-lg-down">When</th>
+                    <th className="w--60">&nbsp;</th>
+                </tr>;
     }
 
     if(this.state.messages.length > 0) {
@@ -95,7 +116,17 @@ class Inbox extends Component {
               return null;
             }
           }
-          return <InboxMessage message={msg} key={msg.id} />;
+          let el = null;
+          if(that.props.hasOwnProperty('showSent')) {
+            if(!msg.hasOwnProperty('to')) {
+              msg['to'] = msg['target'];
+              msg['unixTime'] = "PENDING";
+            }
+            el = <SentMessage message={msg} key={msg.id} />;
+          } else {
+            el = <InboxMessage message={msg} key={msg.id} />;
+          }
+          return el;
       });
 
       messages_rows = <div className="portlet-body pt-0">
@@ -104,16 +135,7 @@ class Inbox extends Component {
                               <table className="table table-align-middle border-bottom mb-6">
 
                                   <thead>
-                                      <tr className="text-muted fs--13">
-                                          <th>
-                                              <span className="px-2 p-0-xs">
-                                                  SUBJECT
-                                              </span>
-                                          </th>
-                                          <th className="w--200 hidden-lg-down">SENDER</th>
-                                          <th className="w--200 hidden-lg-down">DATE</th>
-                                          <th className="w--60">&nbsp;</th>
-                                      </tr>
+                                      {thead}
                                   </thead>
 
                                   <tbody id="item_list">

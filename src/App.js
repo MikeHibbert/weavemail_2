@@ -10,9 +10,8 @@ import Message from './containers/message/Message';
 import NewMessage from './containers/message/NewMessage';
 import MessageReply from './containers/message/MessageReply';
 import SearchPage from './containers/Search/SearchPage';
-import getMessages, {getName, getSentMessages} from './components/Message/helpers';
+import getMessages, {getName, getSentMessages, getPendingMessages, checkPendingMessages} from './components/Message/helpers';
 import arweave from './arweave-config';
-import Notifier from "react-desktop-notification";
 import 'react-toastify/dist/ReactToastify.css';
 import './App.css';
 
@@ -26,7 +25,9 @@ class App extends Component {
     aside_classes: "aside-start aside-primary font-weight-light aside-hide-xs d-flex flex-column h-auto",
     aside_open: false,
     messages: [],
-    sent_messages: []
+    sent_messages: [],
+    pending_messages: [],
+    new_email_count: 0
   }
 
   interval = null;
@@ -38,6 +39,8 @@ class App extends Component {
     this.addErrorAlert.bind(this);
     this.addSuccessAlert.bind(this);
     this.setMessages.bind(this);
+    this.clearNewEmailCount.bind(this);
+    this.getPendingMessages.bind(this);
   } 
 
   componentDidMount() {
@@ -59,19 +62,27 @@ class App extends Component {
     }
 
     const that = this;
-
+    
+    debugger;
+    
     this.interval = setInterval(async function() {
+      debugger;
+      await checkPendingMessages();
       const messages = await getMessages();
-
-      if(messages.length > that.state.messages.length && that.state.messages.length > 0) {
-        const new_count = messages.length - that.state.messages.length;
-        that.addSuccessAlert("You have " + new_count + " new messages")
-      }
+        
+      if(messages.length > this.state.messages.length && this.state.messages.length > 0) {
+        const new_count = messages.length - this.state.messages.length;
+        this.setState({new_email_count: new_count});
+        this.addSuccessAlert("You have " + new_count + " new messages");
+      } 
 
       const sent_messages = await getSentMessages();
+      
+      const pending_messages = getPendingMessages();
 
-      that.setState({messages: messages, sent_messages: sent_messages});      
-    }, 30 * 1000);
+      that.setState({messages: messages, sent_messages: sent_messages, pending_messages: pending_messages});         
+        
+    }, 10 * 1000);
   }
 
   componentDidUpdate(prevProps) {
@@ -103,16 +114,18 @@ class App extends Component {
         }); 
 
         const messages = await getMessages();
-
         
         if(messages.length > this.state.messages.length && this.state.messages.length > 0) {
           const new_count = messages.length - this.state.messages.length;
+          this.setState({new_email_count: new_count});
           this.addSuccessAlert("You have " + new_count + " new messages");
-        }
+        } 
 
         const sent_messages = await getSentMessages();
-
-        that.setState({messages: messages, sent_messages: sent_messages});     
+        
+        const pending_messages = getPendingMessages();
+        
+        that.setState({messages: messages, sent_messages: sent_messages, pending_messages: pending_messages});     
         
 
         getName(wallet_address).then((username) => {
@@ -135,6 +148,11 @@ class App extends Component {
     }
 
     return new_messages;
+  }
+
+  getPendingMessages() {
+    const pending_messages = getPendingMessages();
+    this.setState({pending_messages: pending_messages});  
   }
 
   setWalletAddress(wallet_address_files) {
@@ -214,6 +232,10 @@ class App extends Component {
     debugger;
   }
 
+  clearNewEmailCount() {
+    this.setState({new_email_count: 0});
+  }
+
   render() {
     let header = (
     
@@ -225,17 +247,21 @@ class App extends Component {
           wallet_address={this.state.wallet_address}
           username={this.state.username}
           toggleAside={() => this.toggleAside() }
+          new_email_count={this.state.new_email_count}
+          clearNewEmailCount={() => {this.clearNewEmailCount()}}
+          pending_messages={this.state.pending_messages}
           />
       </header>
     );
     
     let side_menu = (<aside id="aside-main" className={this.state.aside_classes}>
-      <Menu {...this.props} toggleAside={() => this.toggleAside() }/>
+      <Menu {...this.props} toggleAside={() => this.toggleAside() } pending_messages={this.state.pending_messages}/>
     </aside>);
 
     let routes = [
       <Route key='inbox' path="/" exact component={() => <Inbox messages={this.state.messages} wallet_address={this.state.wallet_address} jwk={this.state.jwk} />} />,
       <Route key='sent' path="/sent" exact component={() => <Inbox messages={this.state.sent_messages} showSent={true} wallet_address={this.state.wallet_address} jwk={this.state.jwk} />} />,
+      <Route key='pending' path="/pending" exact component={() => <Inbox messages={this.state.pending_messages} showSent={true} wallet_address={this.state.wallet_address} jwk={this.state.jwk} />} />,
       <Route key='archive' path="/archived" exact component={() => <Inbox messages={this.state.messages} showArchived={true} wallet_address={this.state.wallet_address} jwk={this.state.jwk} />} />,
       <Route key='message-detail' path="/message-detail/:id" exact component={() => <Message 
                                                                       wallet_address={this.state.wallet_address} 
@@ -247,12 +273,14 @@ class App extends Component {
                                                                             wallet_address={this.state.wallet_address} 
                                                                             jwk={this.state.jwk}
                                                                             history={this.props.history}
+                                                                            getPendingMessages={() => { this.getPendingMessages() }}
                                                                           />} />,
       <Route key='reply-message' path='/message/reply/:id' exact component={() => <MessageReply
                                                                             wallet_address={this.state.wallet_address} 
                                                                             jwk={this.state.jwk}
                                                                             messages={this.state.messages}
                                                                             history={this.props.history}
+                                                                            getPendingMessages={() => { this.getPendingMessages() }}
                                                                           />} />,
       <Route key='search' path="/search" exact component={() => <SearchPage wallet_address={this.state.wallet_address} jwk={this.state.jwk} />} />,
       <Route key='logout' path="/logout" exact component={() => <Logout onLogout={this.disconnectWallet.bind(this)} addSuccessAlert={this.addSuccessAlert} expandContentArea={() => {this.expandContentArea()}} />} />
