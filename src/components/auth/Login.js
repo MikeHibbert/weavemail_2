@@ -51,7 +51,7 @@ class Auth extends Component {
             <h1 className="d-inline-block text-align-end text-center-md text-center-xs display-4 h2-xs w-100 max-w-600 w-100-md w-100-xs">
               Sign in
               <span className="display-3 h1-xs d-block font-weight-medium">
-                Weavemail
+                Evermore
               </span>
             </h1>
           </div>
@@ -71,7 +71,7 @@ class Auth extends Component {
 
             <div className="form-label-group mb-3">
             <h3>Login with your AR wallet</h3>
-            <section>Select your <strong>AR wallet</strong> file to start sending secure emails.</section>
+            <section>Select your <strong>AR wallet</strong> file to access your data through our web client.</section>
               {form}
             </div>
 

@@ -6,11 +6,15 @@ import Menu from './components/MainMenu/Menu';
 import Login from './components/auth/Login';
 import Logout from './components/auth/Logout';
 import Inbox from './containers/Inbox/Inbox';
+import RecentActivity from './containers/Files/RecentActivity';
+import FoldersView from './containers/Files/Folders';
 import Message from './containers/message/Message';
 import NewMessage from './containers/message/NewMessage';
 import MessageReply from './containers/message/MessageReply';
 import SearchPage from './containers/Search/SearchPage';
-import getMessages, {getName, getSentMessages, getPendingMessages, checkPendingMessages} from './components/Message/helpers';
+import HomePage from './containers/Home/Hompage';
+import {getFiles} from './containers/Files/helpers';
+import {getName} from './components/Message/helpers';
 import arweave from './arweave-config';
 import 'react-toastify/dist/ReactToastify.css';
 import './App.css';
@@ -24,7 +28,7 @@ class App extends Component {
     wallet_address: null,
     aside_classes: "aside-start aside-primary font-weight-light aside-hide-xs d-flex flex-column h-auto",
     aside_open: false,
-    messages: [],
+    files: null,
     sent_messages: [],
     pending_messages: [],
     new_email_count: 0
@@ -40,7 +44,6 @@ class App extends Component {
     this.addSuccessAlert.bind(this);
     this.setMessages.bind(this);
     this.clearNewEmailCount.bind(this);
-    this.getPendingMessages.bind(this);
   } 
 
   componentDidMount() {
@@ -65,24 +68,24 @@ class App extends Component {
     
     debugger;
     
-    this.interval = setInterval(async function() {
-      debugger;
-      await checkPendingMessages();
-      const messages = await getMessages();
+    // this.interval = setInterval(async function() {
+    //   debugger;
+    //   await checkPendingMessages();
+    //   const messages = await getMessages();
         
-      if(messages.length > this.state.messages.length && this.state.messages.length > 0) {
-        const new_count = messages.length - this.state.messages.length;
-        this.setState({new_email_count: new_count});
-        this.addSuccessAlert("You have " + new_count + " new messages");
-      } 
+    //   if(messages.length > this.state.messages.length && this.state.messages.length > 0) {
+    //     const new_count = messages.length - this.state.messages.length;
+    //     this.setState({new_email_count: new_count});
+    //     this.addSuccessAlert("You have " + new_count + " new messages");
+    //   } 
 
-      const sent_messages = await getSentMessages();
+    //   const sent_messages = await getSentMessages();
       
-      const pending_messages = getPendingMessages();
+    //   const pending_messages = getPendingMessages();
 
-      that.setState({messages: messages, sent_messages: sent_messages, pending_messages: pending_messages});         
+    //   that.setState({messages: messages, sent_messages: sent_messages, pending_messages: pending_messages});         
         
-    }, 10 * 1000);
+    // }, 10 * 1000);
   }
 
   componentDidUpdate(prevProps) {
@@ -113,20 +116,17 @@ class App extends Component {
             that.setState(state);
         }); 
 
-        const messages = await getMessages();
+        const files = await getFiles(wallet_address);
         
-        if(messages.length > this.state.messages.length && this.state.messages.length > 0) {
-          const new_count = messages.length - this.state.messages.length;
-          this.setState({new_email_count: new_count});
-          this.addSuccessAlert("You have " + new_count + " new messages");
-        } 
-
-        const sent_messages = await getSentMessages();
+        // if(files.childeren.length > this.state.files.length && this.state.files.length > 0) {
+        //   const new_count = files.length - this.state.files.length;
+        //   this.setState({new_files_count: new_count});
+        //   this.addSuccessAlert("You have " + new_count + " new files");
+        // } 
+       
+        // const pending_files = getPendingFiles();
         
-        const pending_messages = getPendingMessages();
-        
-        that.setState({messages: messages, sent_messages: sent_messages, pending_messages: pending_messages});     
-        
+        that.setState({files: files});             
 
         getName(wallet_address).then((username) => {
           that.setState({username: username});
@@ -150,9 +150,13 @@ class App extends Component {
     return new_messages;
   }
 
-  getPendingMessages() {
-    const pending_messages = getPendingMessages();
-    this.setState({pending_messages: pending_messages});  
+  getFiles() {
+    const that = this;
+
+    const pending_messages = getFiles().then(files => {
+      that.setState({files: files}); 
+    });
+     
   }
 
   setWalletAddress(wallet_address_files) {
@@ -259,64 +263,52 @@ class App extends Component {
     </aside>);
 
     let routes = [
-      <Route key='inbox' path="/" exact component={() => <Inbox messages={this.state.messages} wallet_address={this.state.wallet_address} jwk={this.state.jwk} />} />,
-      <Route key='sent' path="/sent" exact component={() => <Inbox messages={this.state.sent_messages} showSent={true} wallet_address={this.state.wallet_address} jwk={this.state.jwk} />} />,
-      <Route key='pending' path="/pending" exact component={() => <Inbox messages={this.state.pending_messages} showSent={true} wallet_address={this.state.wallet_address} jwk={this.state.jwk} />} />,
-      <Route key='archive' path="/archived" exact component={() => <Inbox messages={this.state.messages} showArchived={true} wallet_address={this.state.wallet_address} jwk={this.state.jwk} />} />,
-      <Route key='message-detail' path="/message-detail/:id" exact component={() => <Message 
-                                                                      wallet_address={this.state.wallet_address} 
-                                                                      jwk={this.state.jwk} 
-                                                                      location={this.props.location}
-                                                                      messages={this.state.messages}
-                                                                      />} />,
-      <Route key='new-message' path='/message/new' exact component={() => <NewMessage 
-                                                                            wallet_address={this.state.wallet_address} 
-                                                                            jwk={this.state.jwk}
-                                                                            history={this.props.history}
-                                                                            getPendingMessages={() => { this.getPendingMessages() }}
-                                                                          />} />,
-      <Route key='reply-message' path='/message/reply/:id' exact component={() => <MessageReply
-                                                                            wallet_address={this.state.wallet_address} 
-                                                                            jwk={this.state.jwk}
-                                                                            messages={this.state.messages}
-                                                                            history={this.props.history}
-                                                                            getPendingMessages={() => { this.getPendingMessages() }}
-                                                                          />} />,
+      <Route key='home' path="/" exact component={() => <RecentActivity files={this.state.files} wallet_address={this.state.wallet_address} jwk={this.state.jwk} />} />,
+      <Route key='files' path="/files" exact component={() => <FoldersView files={this.state.files} wallet_address={this.state.wallet_address} jwk={this.state.jwk} />} />,
       <Route key='search' path="/search" exact component={() => <SearchPage wallet_address={this.state.wallet_address} jwk={this.state.jwk} />} />,
       <Route key='logout' path="/logout" exact component={() => <Logout onLogout={this.disconnectWallet.bind(this)} addSuccessAlert={this.addSuccessAlert} expandContentArea={() => {this.expandContentArea()}} />} />
     ];
 
-    if(!this.state.isAuthenticated) {
+    let page_content = <div id="wrapper" className="d-flex align-items-stretch flex-column">
+                        <ToastContainer />
+                        {header}
+                        <div id="wrapper_content" className="d-flex flex-fill">
+                          {side_menu}
+                          <div id="middle" className="flex-fill">
+                          {routes}
+                          </div>
+                        </div>
+                      </div>;
+
+    
+
+    if(this.state.isAuthenticated == false) {
       routes = [
+        <Route key='home' path="/" exact component={() => <HomePage wallet_address={this.state.wallet_address} jwk={this.state.jwk} />} />,
         <Route key='login' path="/login" exact component={() => <Login expandContentArea={() => {this.expandContentArea()}} setWalletAddress={this.setWalletAddress.bind(this)} />} />,
       ];
-      if(this.props.location !== '/login') routes.push(<Redirect key='redirect-to-login' to='/login' />);
+
       header = null;
       side_menu = null;
+
+      page_content = <>
+                    <ToastContainer />
+                    {routes}
+                    </>;
+
     } else {
       this.resetContentArea();
     }
 
     if(this.state.isAuthenticated && this.props.location.pathname === '/login') {
-      routes = (
-        <>
-        <Redirect to='/' />
-        </>
-      );
+      routes.push(<Redirect to='/' />);
     }
 
-    return (
-      
-      <div id="wrapper" className="d-flex align-items-stretch flex-column">
-        <ToastContainer />
-        {header}
-        <div id="wrapper_content" className="d-flex flex-fill">
-          {side_menu}
-          <div id="middle" className="flex-fill">
-          {routes}
-          </div>
-        </div>
-      </div>
+    
+
+    return (<>
+      {page_content}
+      </>      
     );
   }
   

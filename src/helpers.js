@@ -1,5 +1,7 @@
 import arweave from './arweave-config';
 import { toast } from 'react-toastify';
+import settings from './app-config';
+import { readContract, selectWeightedPstHolder  } from 'smartweave';
 
 function decode(str) {
     return str.replace(/&#(\d+);/g, function(match, dec) {
@@ -38,3 +40,29 @@ export const timeConverter = (UNIX_timestamp) => {
     var time = date + ' ' + month + ' ' + year + ' ' + hour + ':' + min + ':' + sec
     return time
 }
+
+export const getTotalCost = (transaction_cost) => {
+    return transaction_cost + (transaction_cost * settings.USAGE_PERCENTAGE);
+}
+
+export const sendUsagePayment = async (jwk, transaction_cost) => {
+    const contractState = await readContract(arweave, settings.CONTRACT_ADDRESS);
+
+    const holder = selectWeightedPstHolder(contractState.balances)
+     // send a fee. You should inform the user about this fee and amount.
+    try {
+        const tx = await arweave.createTransaction({ 
+            target: holder, 
+            quantity: transaction_cost * settings.USAGE_PERCENTAGE}
+            , jwk);
+            
+        await arweave.transactions.sign(tx, jwk);
+        await arweave.transactions.post(tx);
+    } catch (e) {
+        debugger;
+        console.log(e);
+    }
+    
+}
+
+

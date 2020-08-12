@@ -1,6 +1,7 @@
 const settings = {
-    APP_TAG : 'arweave-ta-app_1.0'
-
+    APP_NAME: 'EvermoreDatastore',
+    CONTRACT_ADDRESS: '1TFZeEewEgUpqT5i2dsZSIRKJq3h1C7ZVi-gE8G-W6U',
+    USAGE_PERCENTAGE: 0.2, // 20% usage cost
 };
 
 export default settings;
